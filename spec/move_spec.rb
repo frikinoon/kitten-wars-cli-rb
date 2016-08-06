@@ -22,5 +22,9 @@ describe Move do
       move = Move.new(:right)
       expect(move.direction).to be :right
     end
+
+    it 'throws an exception if given a wrong direction' do
+      expect{ Move.new(:other) }.to raise_error(ArgumentError)
+    end
   end
 end
