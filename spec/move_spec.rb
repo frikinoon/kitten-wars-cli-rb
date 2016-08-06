@@ -33,30 +33,34 @@ describe Move do
   describe "#to_json" do
     it 'creates the :up json as expected' do
       move = Move.new(:up)
-      json = move.to_json
 
-      expect(json).to eq '{direction:"u"}'
+      parsed_json = JSON.parse(json = move.to_json, {symbolize_names: true})
+
+      expect(parsed_json).to include(direction: "u")
     end
 
     it 'creates the :down json as expected' do
       move = Move.new(:down)
-      json = move.to_json
 
-      expect(json).to eq '{direction:"d"}'
+      parsed_json = JSON.parse(json = move.to_json, {symbolize_names: true})
+
+      expect(parsed_json).to include(direction: "d")
     end
 
     it 'creates the :left json as expected' do
       move = Move.new(:left)
-      json = move.to_json
 
-      expect(json).to eq '{direction:"l"}'
+      parsed_json = JSON.parse(json = move.to_json, {symbolize_names: true})
+
+      expect(parsed_json).to include(direction: "l")
     end
 
     it 'creates the :right json as expected' do
       move = Move.new(:right)
-      json = move.to_json
 
-      expect(json).to eq '{direction:"r"}'
+      parsed_json = JSON.parse(json = move.to_json, {symbolize_names: true})
+
+      expect(parsed_json).to include(direction: "r")
     end
   end
 end

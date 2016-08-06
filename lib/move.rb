@@ -7,6 +7,6 @@ class Move
   end
 
   def to_json(*args)
-    "{direction:\"#{@direction[0]}\"}"
+    "{\"direction\":\"#{@direction[0]}\"}"
   end
 end
