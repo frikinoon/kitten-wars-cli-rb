@@ -31,36 +31,19 @@ describe Move do
   end
 
   describe "#to_json" do
-    it 'creates the :up json as expected' do
-      move = Move.new(:up)
+    {
+      up: "u",
+      down: "d",
+      left: "l",
+      right: "r",
+    }.each_pair do |symbol, direction|
+      it 'creates the #{symbol} json as expected' do
+        move = Move.new(symbol)
 
-      parsed_json = JSON.parse(json = move.to_json, {symbolize_names: true})
+        parsed_json = JSON.parse(json = move.to_json, {symbolize_names: true})
 
-      expect(parsed_json).to include(direction: "u")
-    end
-
-    it 'creates the :down json as expected' do
-      move = Move.new(:down)
-
-      parsed_json = JSON.parse(json = move.to_json, {symbolize_names: true})
-
-      expect(parsed_json).to include(direction: "d")
-    end
-
-    it 'creates the :left json as expected' do
-      move = Move.new(:left)
-
-      parsed_json = JSON.parse(json = move.to_json, {symbolize_names: true})
-
-      expect(parsed_json).to include(direction: "l")
-    end
-
-    it 'creates the :right json as expected' do
-      move = Move.new(:right)
-
-      parsed_json = JSON.parse(json = move.to_json, {symbolize_names: true})
-
-      expect(parsed_json).to include(direction: "r")
+        expect(parsed_json).to include(direction: direction)
+      end
     end
   end
 end
