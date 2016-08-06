@@ -1,5 +1,6 @@
 require 'spec_helper'
 require 'board'
+require 'json'
 
 describe Board do
   describe "#new" do
@@ -15,6 +16,17 @@ describe Board do
 
       expect(board.width).to eq 32
       expect(board.height).to eq 32
+    end
+  end
+
+  describe "#to_json" do
+    it 'creates the expected :json' do
+      board = Board.new(32,32)
+
+      parsed_json = JSON.parse(board.to_json, {symbolize_names: true})
+
+      expect(parsed_json).to include(width: 32)
+      expect(parsed_json).to include(height: 32)
     end
   end
 end

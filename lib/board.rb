@@ -6,4 +6,7 @@ class Board
    @height = height
   end
 
+  def to_json
+    "{\"width\":#{@width},\"height\":#{@height}}"
+  end
 end
