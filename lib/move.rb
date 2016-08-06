@@ -5,4 +5,8 @@ class Move
     raise ArgumentError unless [:up, :down, :left, :right].include?(direction);
     @direction = direction
   end
+
+  def to_json(*args)
+    "{direction:\"#{@direction[0]}\"}"
+  end
 end
