@@ -14,12 +14,15 @@ EM.run do
 
   ws.onclose do |code, reason|
     puts "Disconnected with status code: #{code}"
+    EM.stop
   end
 
-  EventMachine.next_tick do
-    ws.send "Ruby"
-    # ws.close code: 1000
+  EM.next_tick do
+      ws.send "Ruby"
+  end
 
+  EM.add_timer 0.5 do
+    ws.close 1000
   end
 
 end
