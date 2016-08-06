@@ -1,8 +1,30 @@
 require 'websocket-eventmachine-client'
+require 'json'
+
+class KeyboardHandler < EM::Connection
+  include EM::Protocols::LineText2
+
+  def initialize(ws)
+    @ws = ws
+  end
+
+  def require_data(data)
+    puts data
+  end
+  def receive_line(data)
+    @ws.close if data.chomp[/^$|^\s+$|exit$/]
+    @ws.send data
+  end
+
+end
+
 
 EM.run do
 
-  ws = WebSocket::EventMachine::Client.connect(:uri => 'ws://192.168.1.2:8765')
+  host = "192.168.1.2"
+  port = 8080
+  ws = WebSocket::EventMachine::Client.connect(host: host, port: port)
+  EM.open_keyboard(KeyboardHandler, ws)
 
   ws.onopen do
     puts "Connected"
@@ -14,15 +36,8 @@ EM.run do
 
   ws.onclose do |code, reason|
     puts "Disconnected with status code: #{code}"
+    puts "Reason: #{reason}" unless reason.empty?
     EM.stop
-  end
-
-  EM.next_tick do
-      ws.send "Ruby"
-  end
-
-  EM.add_timer 0.5 do
-    ws.close 1000
   end
 
 end
