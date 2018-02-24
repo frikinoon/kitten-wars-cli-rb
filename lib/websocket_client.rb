@@ -1,37 +1,71 @@
+require 'termios'
 require 'websocket-eventmachine-client'
-require 'json'
 
-class KeyboardHandler < EM::Connection
-  include EM::Protocols::LineText2
+ARROWS = {
+  up:    ["\e", "[", "A"],
+  down:  ["\e", "[", "B"],
+  right: ["\e", "[", "C"],
+  left:  ["\e", "[", "D"],
+}
+WASD_KEYS = %W(w a s d W A S D)
+WASD_MOVES = {
+  w: :up,
+  s: :down,
+  d: :right,
+  a: :left,
+}
 
+module UnbufferedKeyboardHandler
   def initialize(ws)
     @ws = ws
+    @buffer = Array.new(3)
   end
 
-  def require_data(data)
-    puts data
-  end
-  def receive_line(data)
-    @ws.close if data.chomp[/^$|^\s+$|exit$/]
-    @ws.send data
+  def receive_data(data)
+    @buffer.shift
+    @buffer << data
+
+    ARROWS.keys.each do |key|
+      if @buffer == ARROWS[key]
+        @ws.send key
+      end
+    end
+
+    WASD_KEYS.each do |key|
+      if got_non_arrow_key(key)
+        @ws.send WASD_MOVES[key.downcase.to_sym]
+      end
+    end
   end
 
+  private
+
+  def got_non_arrow_key(key)
+    @buffer.last == key && @buffer[-2] != "["
+  end
 end
 
 
 EM.run do
 
-  host = "192.168.1.2"
+  host = "192.168.1.131"
   port = 8080
-  ws = WebSocket::EventMachine::Client.connect(host: host, port: port)
-  EM.open_keyboard(KeyboardHandler, ws)
+  path = "/board"
+  ws = WebSocket::EventMachine::Client.connect(:uri => "ws://#{host}:#{port}#{path}")
+
+  attributes = Termios.tcgetattr($stdin).dup
+  attributes.lflag &= ~Termios::ECHO # Optional.
+  attributes.lflag &= ~Termios::ICANON
+  Termios::tcsetattr($stdin, Termios::TCSANOW, attributes)
+
+  EM.open_keyboard(UnbufferedKeyboardHandler, ws)
 
   ws.onopen do
     puts "Connected"
   end
 
   ws.onmessage do |msg, type|
-    puts "Received message: #{msg}"
+    # puts "Received message: #{msg}"
   end
 
   ws.onclose do |code, reason|
