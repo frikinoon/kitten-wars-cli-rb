@@ -65,7 +65,7 @@ EM.run do
   end
 
   ws.onmessage do |msg, type|
-    # puts "Received message: #{msg}"
+    puts "Received message: #{msg}"
   end
 
   ws.onclose do |code, reason|
